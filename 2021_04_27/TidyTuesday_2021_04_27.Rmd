@@ -1,0 +1,65 @@
+---
+title: "TidyTuesday_4_27_21"
+author: "Camille Leonard"
+date: "4/28/2021"
+output: html_document
+---
+
+https://github.com/rfordatascience/tidytuesday/tree/master/data/2021/2021-04-27 
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidytuesdayR)
+library(tidyverse)
+library(gganimate)
+library(gifski)
+```
+
+
+```{r cars}
+# Get the Data
+
+# Read in with tidytuesdayR package 
+# Install from CRAN via: install.packages("tidytuesdayR")
+# This loads the readme and all the datasets for the week of interest
+
+# Either ISO-8601 date or year/week works!
+
+tuesdata <- tidytuesdayR::tt_load('2021-04-27')
+tuesdata <- tidytuesdayR::tt_load(2021, week = 18)
+
+departures.csv <- tuesdata$departures.csv
+
+# Or read in the data manually
+
+departures <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-04-27/departures.csv')
+
+```
+```{r}
+departures$departure_code <- as.factor(departures$departure_code)
+
+```
+
+
+```{r}
+summary(departures)
+```
+```{r}
+dept_filtered <- departures %>% filter(departure_code != "NA")
+```
+
+
+```{r}
+plot1 <- ggplot(dept_filtered, aes(x=fyear, fill=departure_code)) + 
+        geom_histogram(position = 'dodge')+
+        #facet_wrap(vars(departure_code)) +
+        labs(title="CEO Departures 1987 - 2020")+
+        theme_dark()+
+        scale_fill_discrete(name = "Depature Reason", labels=c("Invol. - Death", "Invol. - Illness", "Invol. - Dismissed job performance", "Invol. - Dismissed legal violations / concern", "Vol. - Retired", "Vol. - New Opportunity", "Other", "Missing", "Execucomp Error"))
+        transition_manual(fyear)
+animate(plot1, renderer=ffmpeg_renderer())
+```
+
